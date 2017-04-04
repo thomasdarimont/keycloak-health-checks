@@ -1,2 +1,3 @@
 de.tdlabs.keycloak.extensions.healthchecker.spi.filesystem.FilesystemHealthIndicatorFactory
 de.tdlabs.keycloak.extensions.healthchecker.spi.database.DatabaseHealthIndicatorFactory
+de.tdlabs.keycloak.extensions.healthchecker.spi.infinispan.InfinispanHealthIndicatorFactory
