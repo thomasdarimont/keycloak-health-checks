@@ -19,7 +19,7 @@ After the extension has been built, install it as a JBoss/WildFly module via `jb
 
 ```
 
-Alternatively, create `$KEYCLOAK_HOME/modules/beercloak/main/module.xml` to load extension from the local Maven repo:
+Alternatively, create `$KEYCLOAK_HOME/modules/de/tdlabs/keycloak/extensions/keycloak-health-checks/main/module.xml` to load extension from the local Maven repo:
 
 ```xml
 <?xml version="1.0" ?>
