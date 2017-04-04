@@ -102,3 +102,8 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
    "state":"DOWN"
 }
 ```
+
+# TODO
+
+## Add health-check for infinispan once Keycloak is on infinispan 9.0.x
+http://blog.infinispan.org/2017/03/checking-infinispan-cluster-health-and.html
