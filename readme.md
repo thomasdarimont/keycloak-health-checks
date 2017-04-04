@@ -61,7 +61,7 @@ Edit the wildfly `standalone.xml` or `standalone-ha.xml`
 ...
 ```
 
-... or install register the provider via the module via `jboss-cli`:
+... or register the provider via the module via `jboss-cli`:
 ```
 /subsystem=keycloak-server:list-add(name=providers,value=module:de.tdlabs.keycloak.extensions.keycloak-health-checks)
 ```
