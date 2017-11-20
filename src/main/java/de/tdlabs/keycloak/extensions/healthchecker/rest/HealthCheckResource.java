@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class HealthCheckResource {
 
@@ -67,23 +68,6 @@ public class HealthCheckResource {
     return accumulator;
   }
 
-//  public static void main(String[] args) throws Exception {
-//
-//    List<HealthStatus> hs = Arrays.asList( //
-//      KeycloakHealthStatus.reportUp("status1") //
-//      , KeycloakHealthStatus.reportDown("status2").withAttribute("message", "oh oh") //
-//      , KeycloakHealthStatus.reportUp("status3") //
-//    );
-//
-//    HealthStatus status = hs.stream() //
-//      .reduce(HealthCheckResource::combineHealthStatus) //
-//      .orElseGet(() -> KeycloakHealthStatus.reportUp("health"));
-//
-//    ObjectMapper om = new ObjectMapper();
-//    om.enable(SerializationFeature.INDENT_OUTPUT);
-//    System.out.println(om.writeValueAsString(status));
-//  }
-
   private static class AggregatedHealthStatus implements HealthStatus {
 
     private final List<HealthStatus> healthInfos = new ArrayList<>();
@@ -106,7 +90,7 @@ public class HealthCheckResource {
     @Override
     public Map<String, Object> getDetails() {
 
-      Map<String, Object> details = new HashMap<>(healthInfos.size());
+      Map<String, Object> details = new TreeMap<>();
 
       for (HealthStatus healthInfo : healthInfos) {
         details.put(healthInfo.getName(), healthInfo.getDetails());
