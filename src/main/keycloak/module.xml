@@ -1,0 +1,18 @@
+<module xmlns="urn:jboss:module:1.1" name="de.tdlabs.keycloak.extensions.keycloak-health-checks">
+
+    <resources>
+	    <resource-root path="keycloak-health-checks.jar"/>
+    </resources>
+
+    <dependencies>
+        <module name="org.keycloak.keycloak-core"/>
+        <module name="org.keycloak.keycloak-services"/>
+        <module name="org.keycloak.keycloak-server-spi"/>
+        <module name="org.keycloak.keycloak-server-spi-private"/>
+        <module name="javax.api"/>
+        <module name="javax.ws.rs.api"/>
+        <module name="com.fasterxml.jackson.core.jackson-core"/>
+        <module name="com.fasterxml.jackson.core.jackson-databind"/>
+        <module name="com.fasterxml.jackson.core.jackson-annotations"/>
+    </dependencies>
+</module>
