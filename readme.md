@@ -4,7 +4,7 @@ A collection of health checks for KeyCloak subsystems.
 
 ## Requirements
 
-* KeyCloak 2.5.5.Final (works also with Keycloak 3.0.0.Final)
+* KeyCloak 4.5.0.Final
 
 ## Build
 
@@ -15,21 +15,19 @@ A collection of health checks for KeyCloak subsystems.
 After the extension has been built, install it as a JBoss/WildFly module via `jboss-cli`:
 
 ```
-[disconnected /] module add --name=de.tdlabs.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-1.0.0-SNAPSHOT.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations
+[disconnected /] module add --name=de.tdlabs.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-1.0.1-SNAPSHOT.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.infinispan
 
 ```
 
 Alternatively, create `$KEYCLOAK_HOME/modules/de/tdlabs/keycloak/extensions/keycloak-health-checks/main/module.xml` to load extension from the local Maven repo:
 
 ```xml
-<?xml version="1.0" ?>
-<module xmlns="urn:jboss:module:1.1" name="de.tdlabs.keycloak.extensions.keycloak-health-checks">
-
+<module name="de.tdlabs.keycloak.extensions.keycloak-health-checks" xmlns="urn:jboss:module:1.5">
     <resources>
-        <artifact name="de.tdlabs.keycloak:keycloak-health-checks:1.0.0-SNAPSHOT"/>        
+        <resource-root path="keycloak-health-checks-1.0.1-SNAPSHOT.jar"/>
     </resources>
-
     <dependencies>
+        <module name="org.infinispan"/>
         <module name="org.keycloak.keycloak-core"/>
         <module name="org.keycloak.keycloak-services"/>
         <module name="org.keycloak.keycloak-server-spi"/>
@@ -79,6 +77,9 @@ You should now see something like with `HTTP Status 200 OK`
       },
       "filesystem":{
          "state":"UP"
+      },
+      "infinispan": {
+         "state":"UP"
       }
    },
    "name":"keycloak",
@@ -96,14 +97,12 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
       "database":{
          "message":"javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:jboss/datasources/KeycloakDS",
          "state":"DOWN"
+      },
+      "infinispan":{
+         "state": "UP"
       }
    },
    "name":"keycloak",
    "state":"DOWN"
 }
 ```
-
-# TODO
-
-## Add health-check for infinispan once Keycloak is on infinispan 9.0.x
-http://blog.infinispan.org/2017/03/checking-infinispan-cluster-health-and.html
