@@ -266,6 +266,26 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
 }
 ```
 
+You can also query the health-checks individually by appending the name of the check to the end of `/health` endpoint URL. 
+
+The following health-checks are currently available:
+* `database`
+* `filesystem` 
+* `infinispan` 
+
+```
+$ curl -s http://localhost:8080/auth/realms/master/health/check/database | jq -C .
+{
+  "state": "UP",
+  "details": {
+    "connection": "established",
+    "state": "UP"
+  },
+  "name": "database"
+}
+
+```
+
 ## Securing the health endpoint
 
 The health endpoint should not be directly exposed to the internet. There are multiple ways to properly secure Keycloak endpoints

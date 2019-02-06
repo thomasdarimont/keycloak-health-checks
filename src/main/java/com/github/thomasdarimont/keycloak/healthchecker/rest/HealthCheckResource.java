@@ -66,7 +66,9 @@ public class HealthCheckResource {
     }
 
     private Optional<HealthIndicator> tryFindFirstHealthIndicatorWithName(String healthIndicatorName) {
-        return Optional.ofNullable(this.session.getProvider(HealthIndicator.class, healthIndicatorName));
+
+        Set<HealthIndicator> allProviders = this.session.getAllProviders(HealthIndicator.class);
+        return allProviders.stream().filter(i -> i.getName().equals(healthIndicatorName)).findFirst();
     }
 
     private HealthStatus combineHealthStatus(HealthStatus first, HealthStatus second) {
