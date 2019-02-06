@@ -265,3 +265,11 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
    "state":"DOWN"
 }
 ```
+
+## Securing the health endpoint
+
+The health endpoint should not be directly exposed to the internet. There are multiple ways to properly secure Keycloak endpoints
+like firewalls, reverse-proxies, or JBoss / wildfly specific configuration options.
+
+The keycloak documentation provides additional information about [securing admin endpoints](https://github.com/keycloak/keycloak-documentation/blob/master/server_admin/topics/threat/admin.adoc#port-restriction). The same mechanism
+can be used to protect the health-endpoints. 
