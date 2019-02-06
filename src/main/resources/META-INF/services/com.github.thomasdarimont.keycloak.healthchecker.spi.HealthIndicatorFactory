@@ -1,0 +1,3 @@
+com.github.thomasdarimont.keycloak.healthchecker.spi.filesystem.FilesystemHealthIndicatorFactory
+com.github.thomasdarimont.keycloak.healthchecker.spi.database.DatabaseHealthIndicatorFactory
+com.github.thomasdarimont.keycloak.healthchecker.spi.infinispan.InfinispanHealthIndicatorFactory

@@ -15,12 +15,35 @@
  * limitations under the License.
  */
 
-package de.tdlabs.keycloak.extensions.healthchecker.spi;
+package com.github.thomasdarimont.keycloak.healthchecker.spi;
 
-import de.tdlabs.keycloak.extensions.healthchecker.model.HealthStatus;
 import org.keycloak.provider.Provider;
+import org.keycloak.provider.ProviderFactory;
+import org.keycloak.provider.Spi;
 
-public interface HealthIndicator extends Provider {
+public class HealthIndicatorSpi implements Spi {
 
-  HealthStatus check();
+    public static final String ID = "health";
+
+    @Override
+    public boolean isInternal() {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return ID;
+    }
+
+    @Override
+    public Class<? extends Provider> getProviderClass() {
+        return HealthIndicator.class;
+    }
+
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Class<? extends ProviderFactory> getProviderFactoryClass() {
+        return HealthIndicatorFactory.class;
+    }
+
 }

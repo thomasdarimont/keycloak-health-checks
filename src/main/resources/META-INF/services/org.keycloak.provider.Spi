@@ -1,1 +1,1 @@
-de.tdlabs.keycloak.extensions.healthchecker.spi.HealthIndicatorSpi
+com.github.thomasdarimont.keycloak.healthchecker.spi.HealthIndicatorSpi

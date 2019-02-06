@@ -1,10 +1,10 @@
 # Keycloak Health Checks
 
-A collection of health checks for KeyCloak subsystems.
+A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 2.5.5.Final (works also with Keycloak 3.0.0.Final)
+* KeyCloak 4.8.3.Final
 
 ## Build
 
@@ -15,18 +15,23 @@ A collection of health checks for KeyCloak subsystems.
 After the extension has been built, install it as a JBoss/WildFly module via `jboss-cli`:
 
 ```
-[disconnected /] module add --name=de.tdlabs.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-1.0.0-SNAPSHOT.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations
 
+$ bin/jboss-cli.sh 
+You are disconnected at the moment. Type 'connect' to connect to the server or 'help' for the list of supported commands.
+[disconnected /] connect
+[standalone@localhost:9990 /] 
+
+[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-4.8.3.0-SNAPSHOT.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
 ```
 
-Alternatively, create `$KEYCLOAK_HOME/modules/de/tdlabs/keycloak/extensions/keycloak-health-checks/main/module.xml` to load extension from the local Maven repo:
+Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` to load extension from the local Maven repo:
 
 ```xml
 <?xml version="1.0" ?>
-<module xmlns="urn:jboss:module:1.1" name="de.tdlabs.keycloak.extensions.keycloak-health-checks">
+<module xmlns="urn:jboss:module:1.1" name="com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks">
 
     <resources>
-        <artifact name="de.tdlabs.keycloak:keycloak-health-checks:1.0.0-SNAPSHOT"/>        
+        <artifact name="com.github.thomasdarimont.keycloak:keycloak-health-checks:4.8.3.0-SNAPSHOT"/>
     </resources>
 
     <dependencies>
@@ -39,6 +44,9 @@ Alternatively, create `$KEYCLOAK_HOME/modules/de/tdlabs/keycloak/extensions/keyc
         <module name="com.fasterxml.jackson.core.jackson-core"/>
         <module name="com.fasterxml.jackson.core.jackson-databind"/>
         <module name="com.fasterxml.jackson.core.jackson-annotations"/>
+        <module name="org.jboss.logging"/>
+        <module name="org.infinispan"/>
+        <module name="org.infinispan.commons"/>
     </dependencies>
 </module>
 ```
@@ -56,33 +64,120 @@ Edit the wildfly `standalone.xml` or `standalone-ha.xml`
                 <provider>
                     classpath:${jboss.home.dir}/providers/*
                 </provider>
-                <provider>module:de.tdlabs.keycloak.extensions.keycloak-health-checks</provider>
+                <provider>module:com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks</provider>
             </providers>
 ...
 ```
 
 ... or register the provider via the module via `jboss-cli`:
 ```
-/subsystem=keycloak-server:list-add(name=providers,value=module:de.tdlabs.keycloak.extensions.keycloak-health-checks)
+/subsystem=keycloak-server:list-add(name=providers,value=module:com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks)
 ```
+
+## Uninstall
+
+To uninstall the provider just remove the ... from `standalone.xml` or `standalone-ha.xml`.
+To uninstall the module just remove the `com/github/thomasdarimont...` directory in your `modules` folder.
 
 ## Running example
 
-Start Keycloak and browse to: http://localhost:8080/auth/realms/master/health/check
+Start Keycloak and browse to: `http://localhost:8080/auth/realms/master/health/check`
 
 You should now see something like with `HTTP Status 200 OK`
+
+```
+curl -v http://localhost:8080/auth/realms/master/health/check | jq -C .
+...
+< HTTP/1.1 200 OK
+< Connection: keep-alive
+< Content-Type: application/json
+< Content-Length: 1090
+< Date: Wed, 06 Feb 2019 19:09:42 GMT
+```
+
 ```json
 {
-   "details":{
-      "database":{
-         "state":"UP"
-      },
-      "filesystem":{
-         "state":"UP"
-      }
-   },
-   "name":"keycloak",
-   "state":"UP"
+  "details": {
+    "database": {
+      "connection": "established",
+      "state": "UP"
+    },
+    "filesystem": {
+      "freebytes": 288779120640,
+      "state": "UP"
+    },
+    "infinispan": {
+      "numberOfNodes": 1,
+      "state": "UP",
+      "healthStatus": "HEALTHY",
+      "nodeNames": [],
+      "cacheDetails": [
+        {
+          "cacheName": "realms",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "authenticationSessions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "sessions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "authorizationRevisions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "clientSessions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "work",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "keys",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "users",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "loginFailures",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "offlineClientSessions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "authorization",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "realmRevisions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "offlineSessions",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "actionTokens",
+          "healthStatus": "HEALTHY"
+        },
+        {
+          "cacheName": "userRevisions",
+          "healthStatus": "HEALTHY"
+        }
+      ],
+      "clusterName": "ISPN"
+    }
+  },
+  "name": "keycloak",
+  "state": "UP"
 }
 ```
 
@@ -96,14 +191,77 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
       "database":{
          "message":"javax.resource.ResourceException: IJ000453: Unable to get managed connection for java:jboss/datasources/KeycloakDS",
          "state":"DOWN"
-      }
+      },
+      "infinispan": {
+         "numberOfNodes": 1,
+         "state": "UP",
+         "healthStatus": "HEALTHY",
+         "nodeNames": [],
+         "cacheDetails": [
+         {
+           "cacheName": "realms",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "authenticationSessions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "sessions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "authorizationRevisions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "clientSessions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "work",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "keys",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "users",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "loginFailures",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "offlineClientSessions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "authorization",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "realmRevisions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "offlineSessions",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "actionTokens",
+           "healthStatus": "HEALTHY"
+         },
+         {
+           "cacheName": "userRevisions",
+           "healthStatus": "HEALTHY"
+         }],
+         "clusterName": "ISPN"
+        }
    },
    "name":"keycloak",
    "state":"DOWN"
 }
 ```
-
-# TODO
-
-## Add health-check for infinispan once Keycloak is on infinispan 9.0.x
-http://blog.infinispan.org/2017/03/checking-infinispan-cluster-health-and.html
