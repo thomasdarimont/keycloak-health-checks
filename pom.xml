@@ -20,7 +20,7 @@
 
         <keycloak.version>4.8.3.Final</keycloak.version>
         <keycloak.versionedArtifactName>keycloak-${keycloak.version}</keycloak.versionedArtifactName>
-        <infinispan.version>9.3.1.Final</infinispan.version>
+        <infinispan.version>10.0.0.Final</infinispan.version>
     </properties>
 
     <dependencies>
