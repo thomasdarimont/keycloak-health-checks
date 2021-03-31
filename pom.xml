@@ -11,16 +11,16 @@
     <properties>
         <!-- general settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- dependency versions -->
         <lombok.version>1.18.4</lombok.version>
 
-        <keycloak.version>4.8.3.Final</keycloak.version>
+        <keycloak.version>11.0.3</keycloak.version>
         <keycloak.versionedArtifactName>keycloak-${keycloak.version}</keycloak.versionedArtifactName>
-        <infinispan.version>9.3.1.Final</infinispan.version>
+        <infinispan.version>10.1.8.Final</infinispan.version>
     </properties>
 
     <dependencies>
