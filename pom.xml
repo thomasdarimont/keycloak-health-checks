@@ -80,6 +80,11 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.1</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
         </plugins>
 
     </build>
@@ -94,4 +99,24 @@
             </snapshots>
         </repository>
     </repositories>
+
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>release</id>
+            <name>Unifly Release Repository</name>
+            <url>https://artifactory.unifly.aero/artifactory/ext-release-local</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>true</uniqueVersion>
+            <id>snapshot</id>
+            <name>Unifly Snapshot Repository</name>
+            <url>https://artifactory.unifly.aero/artifactory/ext-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/unifly-aero/keycloak-health-checks.git</connection>
+    </scm>
 </project>

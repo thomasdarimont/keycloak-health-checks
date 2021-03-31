@@ -1,0 +1,15 @@
+<settings>
+    <servers>
+        <server>
+            <id>snapshot</id>
+            <username>${env.artifactory_user}</username>
+            <password>${env.artifactory_password}</password>
+        </server>
+
+        <server>
+            <id>release</id>
+            <username>${env.artifactory_user}</username>
+            <password>${env.artifactory_password}</password>
+        </server>
+    </servers>
+</settings>
