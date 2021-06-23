@@ -21,7 +21,7 @@ You are disconnected at the moment. Type 'connect' to connect to the server or '
 [disconnected /] connect
 [standalone@localhost:9990 /] 
 
-[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-4.8.3.0-SNAPSHOT.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
+[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks-13.0.0.0.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
 ```
 
 Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` to load extension from the local Maven repo:
@@ -31,7 +31,7 @@ Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak
 <module xmlns="urn:jboss:module:1.1" name="com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks">
 
     <resources>
-        <artifact name="com.github.thomasdarimont.keycloak:keycloak-health-checks:4.8.3.0-SNAPSHOT"/>
+        <artifact name="com.github.thomasdarimont.keycloak:keycloak-health-checks:13.0.0.0"/>
     </resources>
 
     <dependencies>
