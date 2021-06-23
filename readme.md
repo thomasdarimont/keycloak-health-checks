@@ -4,7 +4,7 @@ A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 4.8.3.Final
+* KeyCloak 13.0.0
 
 ## Build
 
