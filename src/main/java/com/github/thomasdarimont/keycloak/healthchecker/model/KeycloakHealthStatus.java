@@ -2,7 +2,7 @@ package com.github.thomasdarimont.keycloak.healthchecker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class KeycloakHealthStatus implements HealthStatus {
@@ -14,7 +14,7 @@ public class KeycloakHealthStatus implements HealthStatus {
     private KeycloakHealthStatus(String checkName, HealthState state) {
         this.checkName = checkName;
         this.state = state;
-        this.attributes = new HashMap<>();
+        this.attributes = new LinkedHashMap<>();
     }
 
     public static KeycloakHealthStatus up(String checkName) {
@@ -40,7 +40,7 @@ public class KeycloakHealthStatus implements HealthStatus {
 
     @JsonIgnore
     public Map<String, Object> getAttributes() {
-        return new HashMap<>(attributes);
+        return new LinkedHashMap<>(attributes);
     }
 
     public Map<String, Object> getDetails() {

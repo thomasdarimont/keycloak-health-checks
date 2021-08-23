@@ -19,16 +19,19 @@ import java.util.stream.Collectors;
 @JBossLog
 public class InfinispanHealthIndicator extends AbstractHealthIndicator {
 
-    private static final String KEYCLOAK_CACHE_MANAGER_JNDI_NAME = "java:jboss/infinispan/container/keycloak";
+    public static final String KEYCLOAK_CACHE_MANAGER_JNDI_NAME = "java:jboss/infinispan/container/keycloak";
 
-    InfinispanHealthIndicator(Config.Scope config) {
+    protected final String jndiName;
+
+    public InfinispanHealthIndicator(Config.Scope config) {
         super("infinispan");
+        this.jndiName = config.get("jndiName", KEYCLOAK_CACHE_MANAGER_JNDI_NAME);
     }
 
     @Override
     public HealthStatus check() {
 
-        Health infinispanHealth = lookupCacheManager().getHealth();
+        Health infinispanHealth = getInfinispanHealth();
         ClusterHealth clusterHealth = infinispanHealth.getClusterHealth();
 
         KeycloakHealthStatus status = determineClusterHealth(clusterHealth);
@@ -51,16 +54,21 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
         return status;
     }
 
-    private EmbeddedCacheManager lookupCacheManager() {
+    protected Health getInfinispanHealth() {
+        return lookupCacheManager().getHealth();
+    }
+
+    protected EmbeddedCacheManager lookupCacheManager() {
         try {
-            return (EmbeddedCacheManager) new InitialContext().lookup(KEYCLOAK_CACHE_MANAGER_JNDI_NAME);
+            Object cacheManager = new InitialContext().lookup(jndiName);
+            return (EmbeddedCacheManager) cacheManager;
         } catch (NamingException e) {
-            log.warnv("Could not find EmbeddedCacheManager with name: {0}", KEYCLOAK_CACHE_MANAGER_JNDI_NAME);
+            log.warnv("Could not find EmbeddedCacheManager with name: {0}", jndiName);
             throw new RuntimeException(e);
         }
     }
 
-    private KeycloakHealthStatus determineClusterHealth(ClusterHealth clusterHealth) {
+    protected KeycloakHealthStatus determineClusterHealth(ClusterHealth clusterHealth) {
 
         switch (clusterHealth.getHealthStatus()) {
             case HEALTHY:
