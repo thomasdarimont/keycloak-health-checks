@@ -2,6 +2,13 @@
 
 A collection of health-checks for Keycloak subsystems.
 
+## Supported Checks
+
+1. Filesystem (Instance Level)
+1. Database (Instance Level)
+1. Infinispan Cluster state (Instance Level)
+1. LDAP User Federation (Realm Level)
+
 ## Requirements
 
 * KeyCloak 15.0.2
