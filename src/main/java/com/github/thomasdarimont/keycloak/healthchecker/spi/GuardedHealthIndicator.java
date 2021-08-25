@@ -4,11 +4,11 @@ package com.github.thomasdarimont.keycloak.healthchecker.spi;
 import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.model.KeycloakHealthStatus;
 
-public class GuardedHeathIndicator implements HealthIndicator {
+public class GuardedHealthIndicator implements HealthIndicator {
 
     private final HealthIndicator healthIndicator;
 
-    public GuardedHeathIndicator(HealthIndicator healthIndicator) {
+    public GuardedHealthIndicator(HealthIndicator healthIndicator) {
         this.healthIndicator = healthIndicator;
     }
 
@@ -27,5 +27,10 @@ public class GuardedHeathIndicator implements HealthIndicator {
                     .withAttribute("error", "health-check")
                     .withAttribute("errorMessage", ex.getMessage());
         }
+    }
+
+    @Override
+    public boolean isApplicable() {
+        return healthIndicator.isApplicable();
     }
 }

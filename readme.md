@@ -21,7 +21,7 @@ You are disconnected at the moment. Type 'connect' to connect to the server or '
 [disconnected /] connect
 [standalone@localhost:9990 /] 
 
-[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
+[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
 ```
 
 Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` and copy the .jar file next to the module.xml file:
@@ -40,6 +40,11 @@ Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak
         <module name="org.keycloak.keycloak-services"/>
         <module name="org.keycloak.keycloak-server-spi"/>
         <module name="org.keycloak.keycloak-server-spi-private"/>
+        <module name="org.keycloak.keycloak-ldap-federation"/>
+        <module name="org.keycloak.keycloak-kerberos-federation"/>
+        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
+        <module name="org.apache.httpcomponents"/>
+        <module name="com.google.guava"/>
         <module name="javax.api"/>
         <module name="javax.ws.rs.api"/>
         <module name="com.fasterxml.jackson.core.jackson-core"/>
@@ -114,14 +119,16 @@ curl -v http://localhost:8080/auth/realms/master/health/check | jq -C .
       "state": "UP"
     },
     "filesystem": {
-      "freebytes": 288779120640,
+      "freebytes": 425570316288,
       "state": "UP"
     },
     "infinispan": {
-      "numberOfNodes": 1,
-      "state": "UP",
+      "clusterName": "ejb",
       "healthStatus": "HEALTHY",
-      "nodeNames": [],
+      "numberOfNodes": 1,
+      "nodeNames": [
+        "neumann"
+      ],
       "cacheDetails": [
         {
           "cacheName": "realms",
@@ -140,11 +147,11 @@ curl -v http://localhost:8080/auth/realms/master/health/check | jq -C .
           "healthStatus": "HEALTHY"
         },
         {
-          "cacheName": "clientSessions",
+          "cacheName": "work",
           "healthStatus": "HEALTHY"
         },
         {
-          "cacheName": "work",
+          "cacheName": "clientSessions",
           "healthStatus": "HEALTHY"
         },
         {
@@ -160,11 +167,11 @@ curl -v http://localhost:8080/auth/realms/master/health/check | jq -C .
           "healthStatus": "HEALTHY"
         },
         {
-          "cacheName": "offlineClientSessions",
+          "cacheName": "authorization",
           "healthStatus": "HEALTHY"
         },
         {
-          "cacheName": "authorization",
+          "cacheName": "offlineClientSessions",
           "healthStatus": "HEALTHY"
         },
         {
@@ -184,7 +191,16 @@ curl -v http://localhost:8080/auth/realms/master/health/check | jq -C .
           "healthStatus": "HEALTHY"
         }
       ],
-      "clusterName": "ISPN"
+      "state": "UP"
+    },
+    "ldap": {
+      "ldapStatus": {
+        "ldap1": {
+          "providerName": "ldap1",
+          "status": "OK"
+        }
+      },
+      "state": "UP"
     }
   },
   "name": "keycloak",
@@ -271,6 +287,17 @@ In case a check fails, you should get a response with `HTTP Status 503 SERVICE U
          }],
          "clusterName": "ISPN"
         }
+   },
+   "ldap": {
+     "ldapStatus": {
+       "ldap1": {
+         "providerName": "ldap1",
+         "status": "ERROR",
+         "errorMessage": "LDAP Query failed",
+         "hint": "Connection refused (Connection refused): localhost:13891"
+       }
+     },
+     "state": "DOWN"
    },
    "name":"keycloak",
    "state":"DOWN"

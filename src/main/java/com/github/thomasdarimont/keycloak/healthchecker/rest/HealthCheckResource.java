@@ -3,7 +3,7 @@ package com.github.thomasdarimont.keycloak.healthchecker.rest;
 
 import com.github.thomasdarimont.keycloak.healthchecker.model.AggregatedHealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
-import com.github.thomasdarimont.keycloak.healthchecker.spi.GuardedHeathIndicator;
+import com.github.thomasdarimont.keycloak.healthchecker.spi.GuardedHealthIndicator;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.HealthIndicator;
 import org.keycloak.models.KeycloakSession;
 
@@ -51,7 +51,7 @@ public class HealthCheckResource {
     public Response checkHealthFor(@PathParam("indicator") String name) {
 
         return tryFindFirstHealthIndicatorWithName(name)
-                .map(GuardedHeathIndicator::new)
+                .map(GuardedHealthIndicator::new)
                 .map(HealthIndicator::check)
                 .map(this::toHealthResponse)
                 .orElse(NOT_FOUND);
@@ -60,7 +60,8 @@ public class HealthCheckResource {
     protected Optional<HealthStatus> aggregatedHealthStatusFrom(Set<HealthIndicator> healthIndicators) {
 
         return healthIndicators.stream() //
-                .map(GuardedHeathIndicator::new) //
+                .map(GuardedHealthIndicator::new) //
+                .filter(HealthIndicator::isApplicable) // only show relevant health indicators
                 .map(HealthIndicator::check) //
                 .reduce(this::combineHealthStatus); //
     }
