@@ -80,6 +80,16 @@ Edit the wildfly `standalone.xml` or `standalone-ha.xml`
 To uninstall the provider just remove the ... from `standalone.xml` or `standalone-ha.xml`.
 To uninstall the module just remove the `com/github/thomasdarimont...` directory in your `modules` folder.
 
+## Disabling a Health-Check
+
+A healh-check can be disabled via the jboss-cli.
+
+To disable the `filesystem-health` check, one can use the following command:
+```
+/subsystem=keycloak-server/spi=health/:add
+/subsystem=keycloak-server/spi=health/provider=filesystem-health/:add(enabled=false)
+```
+
 ## Running example
 
 Start Keycloak and browse to: `http://localhost:8080/auth/realms/master/health/check`
