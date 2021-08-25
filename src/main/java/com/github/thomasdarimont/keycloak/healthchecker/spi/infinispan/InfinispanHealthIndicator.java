@@ -44,6 +44,7 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
         }).collect(Collectors.toList());
 
         status//
+                .withAttribute("hostInfo",  infinispanHealth.getHostInfo())
                 .withAttribute("clusterName", clusterHealth.getClusterName()) //
                 .withAttribute("healthStatus", clusterHealth.getHealthStatus()) //
                 .withAttribute("numberOfNodes", clusterHealth.getNumberOfNodes()) //
