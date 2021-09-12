@@ -1,0 +1,319 @@
+#!/usr/bin/php
+<?php // Copyright (c) 2021 Oliver Welter
+
+function icingamsg($msg, $type = "UNKNOWN")
+{
+        $exitcode = 3;
+
+        switch ($type)
+        {
+                case "OK":
+                        $exitcode = 0;
+                        break;
+                case "WARNING":
+                        $exitcode = 1;
+                        break;
+                case "CRITICAL":
+                        $exitcode = 2;
+                        break;
+                default:
+                        $type = "UNKNOWN";
+                        break;
+        }
+
+        echo $type.": ".$msg."\n";
+        exit($exitcode);
+}
+
+function format_size($bytes)
+{
+        if ($bytes >= 1073741824)
+        {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        }
+        elseif ($bytes >= 1048576)
+        {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        }
+        elseif ($bytes >= 1024)
+        {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        }
+        elseif ($bytes > 1)
+        {
+            $bytes = $bytes . ' bytes';
+        }
+        elseif ($bytes == 1)
+        {
+            $bytes = $bytes . ' byte';
+        }
+        else
+        {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
+}
+
+if ($argc < 2)
+        icingamsg("Missing required argument -H");
+
+$help = "Usage: ".$argv[0]." -h for help\n\n";
+$help .= "Switches:\n";
+$help .= " -H hostname          Set hostname of Keycloak server\n";
+$help .= " -R realm             Set realm (default: master)\n";
+$help .= " -P protocol          Either http or https (default: http)\n";
+$help .= " -p port              Port of admin interface (default: 8080)\n";
+$help .= " -U user-agent        Specify a user agent\n";
+$help .= " -C ca-file           Filename for ca information\n";
+$help .= " -c ca-path           Path for ca information\n";
+$help .= " -n                   Disable certificate checks\n";
+$help .= " -S                   Do not verify host, while using ssl\n";
+$help .= " -s                   Do not verify peer, while using ssl\n";
+$help .= " -F                   Follow location on redirect\n";
+$help .= " -X                   Do not do anything, just print config\n";
+$help .= " -J                   Do not check, just print json object\n";
+$help .= " -j                   Do not check, just print response\n";
+$help .= " -h                   This help context\n\n";
+$help .= "Written by Oliver Welter.\n";
+
+$config = new stdClass;
+$config->uri = "%s://%s:%d/auth/realms/%s/health/check";
+$config->realm = "master";
+$config->protocol = "http";
+$config->port = 8080;
+$config->host = "localhost";
+$config->ca_info = null;
+$config->ca_path = "/etc/ssl/certs";
+$config->user_agent = "Icinga2 Keycloak check 1.0";
+$config->follow_location = false;
+$config->ssl_verify_host = 2;
+$config->ssl_verify_peer = 1;
+$config->no_certificate_checks = false;
+$config->print_config = false;
+$config->print_json_object = false;
+$config->print_raw_result = false;
+$config->check = "summary";
+
+for ($i = 0; $i < $argc; $i++)
+{
+        switch ($argv[$i])
+        {
+                case "-H":
+                        $i++;
+                        $config->host = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-R":
+                        $i++;
+                        $config->realm = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-P":
+                        $i++;
+                        $config->protocol = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-p":
+                        $i++;
+                        $config->port = filter_var($argv[$i], FILTER_SANITIZE_NUMBER_INT);
+                        break;
+                case "-U":
+                        $i++;
+                        $config->user_agent = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-C":
+                        $i++;
+                        $config->ca_info = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-c":
+                        $i++;
+                        $config->ca_path = filter_var($argv[$i], FILTER_SANITIZE_STRIPPED);
+                        break;
+                case "-S":
+                        $config->ssl_verify_host = false;
+                        break;
+                case "-s":
+                        $config->ssl_verify_peer = false;
+                        break;
+                case "-n":
+                        $config->no_certificate_checks = true;
+                        break;
+                case "-X":
+                        $config->print_config = true;
+                        break;
+                case "-J":
+                        $config->print_json_object = true;
+                        break;
+                case "-j":
+                        $config->print_raw_result = true;
+                        break;
+                case "-h":
+                        icingamsg($help);
+        }
+}
+
+if (!$config->host)
+        icingamsg("Missing required hostname");
+elseif (!$config->port)
+        icingamsg("Missing required port");
+elseif (!$config->realm)
+        icingamsg("Missing required realm");
+elseif (!$config->protocol)
+        icingamsg("Missing required protocol");
+elseif (($config->protocol != "http") && ($config->protocol != "https"))
+        icingamsg("Protocol must be one of http or https");
+elseif ((!is_numeric($config->port)) && ($config->port >= 1) && ($config->port <= 65535))
+        icingamsg("Port has to be numeric and within 1 and 65535");
+
+$config->check_url = filter_var(sprintf(
+        $config->uri,
+        $config->protocol,
+        $config->host,
+        $config->port,
+        $config->realm
+), FILTER_SANITIZE_URL);
+
+if (!$config->check_url)
+        icingamsg("Invalid URL, check parameters");
+
+if ($config->print_config)
+        icingamsg("Config ".print_r($config, 1));
+
+$ch = curl_init($config->check_url);
+
+if (!is_resource($ch))
+        icingamsg("Unable to initialize curl");
+
+if ($config->user_agent)
+        curl_setopt($ch, CURLOPT_USERAGENT, $config->user_agent);
+
+if ($config->ca_info)
+        curl_setopt($ch, CURLOPT_CAINFO, $config->ca_info);
+
+if ($config->ca_path)
+        curl_setopt($ch, CURLOPT_CAPATH, $config->ca_path);
+
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, $config->follow_location);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $config->ssl_verify_host);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $config->ssl_verify_peer);
+
+if ($config->no_certificate_checks)
+{
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+}
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, array('ACCEPT: application/json', 'Connection: close'));
+
+$result = curl_exec($ch);
+
+curl_close($ch);
+unset($ch);
+
+if (!$result)
+        icingamsg("No response from keycloak", "CRITICAL");
+
+$json = json_decode($result);
+
+if ($config->print_raw_result)
+        icingamsg($result);
+
+unset($result);
+
+if (!is_object($json))
+        icingamsg("Invalid response from keycloak");
+
+if ($config->print_json_object)
+        icingamsg("JSON object ".print_r($json,1));
+
+$check_result = "UNNKNOWN";
+$check_msg = "Unknown or unhandled state";
+
+if ($config->check == "summary")
+{
+        switch ($json->state)
+        {
+                case "UP":
+                        $check_result = "OK";
+                        $check_msg = $json->name." is up - infinispan cluster ".$json->details->infinispan->clusterName." has ".$json->details->infinispan->numberOfNodes." node".(($json->details->infinispan->numberOfNodes == 1) ? "" : "s");
+
+                        switch ($json->details->database->state)
+                        {
+                                case "UP":
+                                        break;
+                                case "DOWN":
+                                        $check_result = "CRITICAL";
+                                        $check_msg = "Database is down, connection ".$json->details->database->connection;
+                                        break;
+                                default:
+                                        $check_result = "UNKNOWN";
+                                        $check_msg = "Database state ".$json->details->database->state." unhandled, connection ".$json->details->database->connection;
+                                        break;
+                        }
+
+                        switch ($json->details->filesystem->state)
+                        {
+                                case "UP":
+                                        break;
+                                case "DOWN":
+                                        $check_result = "CRITICAL";
+                                        $check_msg = "Filesystem in down state, free ".format_size($json->details->filesystem->freebytes);
+                                        break;
+                                default:
+                                        $check_result = "UNKNOWN";
+                                        $check_msg = "Filesystem has unknown state ".$json->details->filesystem->state.", free ".format_size($json->details->filesystem->freebytes);
+                                        break;
+                        }
+
+                        switch ($json->details->infinispan->state)
+                        {
+                                case "UP":
+                                        $freeRam = (100 - (100 / $json->details->infinispan->hostInfo->totalMemoryKb * $json->details->infinispan->hostInfo->freeMemoryInKb));
+
+                                        if ($freeRam < 20)
+                                        {
+                                                $check_result = "WARNING";
+                                                $check_msg = "Infinispan free host memory is below 20% (total: ".format_size($json->details->infinispan->hostInfo->totalMemoryKb * 1024).", free: ".format_size($json->details->infinispan->hostInfo->freeMemoryInKb * 1024).")";
+                                        }
+                                        elseif ($freeRam < 5)
+                                        {
+                                                $check_result = "CRITICAL";
+                                                $check_msg = "Infinispan free host memory is below 5% (total: ".format_size($json->details->infinispan->hostInfo->totalMemoryKb * 1024).", free: ".format_size($json->details->infinispan->hostInfo->freeMemoryInKb * 1024).")";
+                                        }
+                                        break;
+                                case "DOWN":
+                                        $check_result = "CRITICAL";
+                                        $check_msg = "Infinispan is down - cluster ".$json->details->infinispan->clusterName." is ".strtolower($json->details->infinispan->healthStatus).", with ".$json->details->infinispan->numberOfNodes." node".(($json->details->infinispan->numberOfNodes == 1) ? "" : "s");
+                                        break;
+                                default:
+                                        $check_result = "UNKNOWN";
+                                        $check_msg = "Infinispan state ".$json->details->infinispan->state." unhandled - cluster ".$json->details->infinispan->clusterName." is ".strtolower($json->details->infinispan->healthStatus).", with ".$json->details->infinispan->numberOfNodes." node".(($json->details->infinispan->numberOfNodes == 1) ? "" : "s");
+                                        break;
+                        }
+
+                        if ($json->details->infinispan->healthStatus != "HEALTHY")
+                        {
+                                $check_result = "CRITICAL";
+                                $check_msg = "Infinispan is no longer healthy. Affected cache(s): ";
+                                $caches = array();
+
+                                foreach ($json->details->infinispan->cacheDetails as $cache)
+                                {
+                                        if ($cache->healthStatus != "HEALTHY")
+                                                array_push($caches, $cache->cacheName." (".$cache->healthStatus.")");
+                                }
+
+                                $check_msg .= implode(", ", $caches);
+                        }
+                        break;
+                case "DOWN":
+                        $check_result = "CRITICAL";
+                        $check_msg = $json->name." is down";
+                        break;
+                default:
+                        $check_msg = $json->name." is in an unknown state";
+                        break;
+        }
+}
+
+icingamsg($check_msg, $check_result);
+unset($config);
