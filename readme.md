@@ -11,7 +11,7 @@ A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 15.0.2
+* KeyCloak 16.1.0
 
 ## Build
 
