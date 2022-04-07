@@ -3,11 +3,14 @@ package com.github.thomasdarimont.keycloak.healthchecker.spi.infinispan;
 import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.model.KeycloakHealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.AbstractHealthIndicator;
+import com.github.thomasdarimont.keycloak.healthchecker.support.KeycloakUtil;
+import io.quarkus.arc.Arc;
 import lombok.extern.jbosslog.JBossLog;
 import org.infinispan.health.ClusterHealth;
 import org.infinispan.health.Health;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.keycloak.Config;
+import org.keycloak.quarkus.runtime.storage.infinispan.CacheManagerFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -44,7 +47,7 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
         }).collect(Collectors.toList());
 
         status//
-                .withAttribute("hostInfo",  infinispanHealth.getHostInfo())
+                .withAttribute("hostInfo", infinispanHealth.getHostInfo())
                 .withAttribute("clusterName", clusterHealth.getClusterName()) //
                 .withAttribute("healthStatus", clusterHealth.getHealthStatus()) //
                 .withAttribute("numberOfNodes", clusterHealth.getNumberOfNodes()) //
@@ -60,13 +63,19 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
     }
 
     protected EmbeddedCacheManager lookupCacheManager() {
-        try {
-            Object cacheManager = new InitialContext().lookup(jndiName);
-            return (EmbeddedCacheManager) cacheManager;
-        } catch (NamingException e) {
-            log.warnv("Could not find EmbeddedCacheManager with name: {0}", jndiName);
-            throw new RuntimeException(e);
+
+        if (KeycloakUtil.isRunningOnKeycloak()) {
+            try {
+                Object cacheManager = new InitialContext().lookup(jndiName);
+                return (EmbeddedCacheManager) cacheManager;
+            } catch (NamingException e) {
+                log.warnv("Could not find EmbeddedCacheManager with name: {0}", jndiName);
+                throw new RuntimeException(e);
+            }
         }
+
+        // Manual lookup via Arc for Keycloak.X
+        return Arc.container().instance(CacheManagerFactory.class).get().getOrCreate();
     }
 
     protected KeycloakHealthStatus determineClusterHealth(ClusterHealth clusterHealth) {

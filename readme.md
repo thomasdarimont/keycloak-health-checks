@@ -11,13 +11,46 @@ A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 15.0.2
+* KeyCloak 17.0.1+
+
+## Compatibility
+
+| Keycloak-Health Check Version | Keycloak         | Keycloak.X      |
+|-------------------------------|------------------|-----------------|
+| 15.0.2.0                      | 15.0.2 - 17.0.1  | not supported   |
+| 17.0.1.0                      | 17.0.1           | 17.0.1          |
 
 ## Build
 
 `mvn install`
 
-## Installation
+## Keycloak.X
+
+### Installation
+
+Copy the `keycloak-health-checks.jar` file into the `/providers` folder of your Keycloak.X installation.
+
+### Removal
+
+Delete the `keycloak-health-checks.jar` file from the `/providers` folder.
+
+### Configuration
+
+The following health-check providers are supported: 
+- `infinispan`
+- `database`
+- `ldap`
+- `filesystem`
+
+To disable the `filesystem-health` check, one can use the following config setting in keycloak.conf
+```
+spi-health-filesystem-health-enabled=false
+```
+
+
+## Keycloak-Legacy
+
+### Installation
 
 After the extension has been built, install it as a JBoss/WildFly module via `jboss-cli`:
 
@@ -28,7 +61,7 @@ You are disconnected at the moment. Type 'connect' to connect to the server or '
 [disconnected /] connect
 [standalone@localhost:9990 /] 
 
-[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
+[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.enterprise.api,javax.transaction.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
 ```
 
 Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` and copy the .jar file next to the module.xml file:
@@ -53,6 +86,8 @@ Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak
         <module name="org.apache.httpcomponents"/>
         <module name="com.google.guava"/>
         <module name="javax.api"/>
+        <module name="javax.transaction.api"/>
+        <module name="javax.enterprise.api"/>
         <module name="javax.ws.rs.api"/>
         <module name="com.fasterxml.jackson.core.jackson-core"/>
         <module name="com.fasterxml.jackson.core.jackson-databind"/>
@@ -64,7 +99,10 @@ Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak
 </module>
 ```
 
-## Configuration
+To uninstall the provider just remove the ... from `standalone.xml` or `standalone-ha.xml`.
+To uninstall the module just remove the `com/github/thomasdarimont...` directory in your `modules` folder.
+
+### Configuration
 
 Edit the wildfly `standalone.xml` or `standalone-ha.xml`
 `$KEYCLOAK_HOME/standalone/configuration/standalone.xml`:
@@ -87,12 +125,7 @@ Edit the wildfly `standalone.xml` or `standalone-ha.xml`
 /subsystem=keycloak-server:list-add(name=providers,value=module:com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks)
 ```
 
-## Uninstall
-
-To uninstall the provider just remove the ... from `standalone.xml` or `standalone-ha.xml`.
-To uninstall the module just remove the `com/github/thomasdarimont...` directory in your `modules` folder.
-
-## Disabling a Health-Check
+#### Disabling a Health-Check with Keycloak-Legacy
 
 A healh-check can be disabled via the jboss-cli.
 

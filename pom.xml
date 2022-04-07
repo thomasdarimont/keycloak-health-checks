@@ -6,7 +6,7 @@
 
     <groupId>com.github.thomasdarimont.keycloak</groupId>
     <artifactId>keycloak-health-checks</artifactId>
-    <version>15.0.2.0</version>
+    <version>17.0.1.0</version>
 
     <properties>
         <!-- general settings -->
@@ -16,11 +16,13 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- dependency versions -->
-        <lombok.version>1.18.20</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
 
-        <keycloak.version>15.0.2</keycloak.version>
+        <keycloak.version>17.0.1</keycloak.version>
         <keycloak.versionedArtifactName>keycloak-${keycloak.version}</keycloak.versionedArtifactName>
-        <infinispan.version>11.0.9.Final</infinispan.version>
+        <infinispan.version>12.1.7.Final</infinispan.version>
+        <cdi-api.version>2.0.2</cdi-api.version>
+        <quarkus.version>2.7.4.Final</quarkus.version>
     </properties>
 
     <dependencies>
@@ -73,6 +75,28 @@
             <version>${infinispan.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>${cdi-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+            <version>${quarkus.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-quarkus-server</artifactId>
+            <version>${keycloak.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

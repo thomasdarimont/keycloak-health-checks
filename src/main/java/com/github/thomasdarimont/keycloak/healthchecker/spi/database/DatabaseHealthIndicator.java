@@ -2,11 +2,13 @@ package com.github.thomasdarimont.keycloak.healthchecker.spi.database;
 
 import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.AbstractHealthIndicator;
+import com.github.thomasdarimont.keycloak.healthchecker.support.KeycloakUtil;
 import lombok.extern.jbosslog.JBossLog;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.utils.StringUtil;
 
+import javax.enterprise.inject.spi.CDI;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -27,7 +29,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator {
     public DatabaseHealthIndicator(KeycloakSession session, Config.Scope config) {
         super("database");
         this.jndiName = config.get("jndiName", KEYCLOAK_DATASOURCE_JNDI_NAME);
-        this.healthQuery = config.get("query", "SELECT 1");
+        this.healthQuery = config.get("query");
         this.connectionTimeoutMillis = config.getInt("connectionTimeout", 1000);
     }
 
@@ -37,20 +39,22 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator {
         try {
             DataSource dataSource = lookupDataSource();
             if (isDatabaseReady(dataSource, healthQuery)) {
-                return reportUp()
-                        .withAttribute("connection", "established");
+                return reportUp().withAttribute("connection", "established");
             }
         } catch (Exception ex) {
-            return reportDown()
-                    .withAttribute("connection", "error")
-                    .withAttribute("message", ex.getMessage());
+            return reportDown().withAttribute("connection", "error").withAttribute("message", ex.getMessage());
         }
 
         return reportDown();
     }
 
     protected DataSource lookupDataSource() throws Exception {
-        return (DataSource) new InitialContext().lookup(jndiName);
+        if (KeycloakUtil.isRunningOnKeycloak()) {
+            return (DataSource) new InitialContext().lookup(jndiName);
+        }
+
+        // Manual lookup via CDI for Keycloak.X
+        return CDI.current().select(DataSource.class).get();
     }
 
     protected boolean isDatabaseReady(DataSource dataSource, String healthQuery) throws Exception {
