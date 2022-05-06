@@ -1,0 +1,93 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Read the tag var
+        id: create_tag
+        run: |
+          tag=$(basename "${{ github.ref }}")
+          echo "::set-output name=tag::$tag"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.tag }}
+          release_name: ${{ steps.create_tag.outputs.tag }}
+          draft: true
+          prerelease: false
+      - name: Create artifact files
+        run: |
+          mkdir info
+          echo "${{ steps.create_release.outputs.id }}" > info/release_id
+          echo "${{ steps.create_release.outputs.upload_url }}" > info/upload_url
+      - uses: actions/upload-artifact@v1
+        with:
+          name: info
+          path: info
+
+  build:
+    needs: [ release ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: info
+      - name: Set upload_url
+        id: upload_info
+        run: |
+          upload_url=$(cat info/upload_url)
+          echo "::set-output name=upload_url::$upload_url"
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+      - name: Upload JAR
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.upload_info.outputs.upload_url }}
+          asset_path: target/keycloak-health-checks.jar
+          asset_name: keycloak-health-checks.jar
+          asset_content_type: application/java-archive
+
+  metadata:
+    name: Publish Release
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v1
+        with:
+          name: info
+      - name: Set publish_info
+        id: publish_info
+        run: |
+          release_id=$(cat info/release_id)
+          echo "::set-output name=release_id::$release_id"
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.publish_info.outputs.release_id }}
