@@ -10,7 +10,7 @@ import org.infinispan.health.ClusterHealth;
 import org.infinispan.health.Health;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.keycloak.Config;
-import org.keycloak.quarkus.runtime.storage.infinispan.CacheManagerFactory;
+import org.keycloak.quarkus.runtime.storage.legacy.infinispan.CacheManagerFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
