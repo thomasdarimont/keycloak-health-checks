@@ -4,6 +4,7 @@ import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.AbstractHealthIndicator;
 import com.github.thomasdarimont.keycloak.healthchecker.support.ExceptionUtils;
 import org.keycloak.Config;
+import org.keycloak.component.ComponentModel;
 import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.LDAPConstants;
@@ -47,9 +48,8 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
     @Override
     public boolean isApplicable() {
         // do we have an enabled user storage provider
-        return session.getContext().getRealm().getUserStorageProvidersStream()
-                .filter(this::isLdapUserStorageProvider) // only consider ldap providers
-                .anyMatch(CacheableStorageProviderModel::isEnabled);
+        return session.getContext().getRealm().getStorageProviders(LDAPStorageProvider.class)
+                .findAny().isPresent();
     }
 
     @Override
@@ -84,8 +84,7 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
         }
 
         // we want the status of all registered dedicated ldap providers
-        return realm.getUserStorageProvidersStream()
-                .filter(this::isLdapUserStorageProvider) // filter for ldap providers
+        return realm.getStorageProviders(LDAPStorageProvider.class)
                 .map(uspm -> checkLdapStatus(realm, uspm.getName(), uspm))
                 .collect(Collectors.toList());
     }
@@ -98,9 +97,11 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
         return checkLdapStatus(realm, providerName, getLdapUserStorageProviderModelByName(realm, providerName));
     }
 
-    protected LdapStatusInfo checkLdapStatus(RealmModel realm, String providerName, UserStorageProviderModel ldapProviderModel) {
-
-        if (ldapProviderModel == null) {
+    protected LdapStatusInfo checkLdapStatus(RealmModel realm, String providerName, ComponentModel componentModel) {
+        UserStorageProviderModel ldapProviderModel;
+        if (componentModel instanceof UserStorageProviderModel) {
+            ldapProviderModel = (UserStorageProviderModel) componentModel;
+        } else {
             return LdapStatusInfo.error(providerName, ERROR_PROVIDER_NOT_FOUND_BY_NAME);
         }
 
@@ -135,11 +136,15 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
     }
 
     protected UserStorageProviderModel getLdapUserStorageProviderModelByName(RealmModel realm, String providerName) {
-        return realm.getUserStorageProvidersStream()
+        ComponentModel componentModel = realm.getStorageProviders(LDAPStorageProvider.class)
                 .filter(provider -> provider.getName().equals(providerName))
-                .filter(this::isLdapUserStorageProvider)
                 .findFirst()
                 .orElse(null);
+        if (componentModel instanceof UserStorageProviderModel) {
+            return (UserStorageProviderModel) componentModel;
+        } else {
+            return null;
+        }
     }
 
     protected List<LDAPObject> searchUsersInLdapByUsername(RealmModel realm, LDAPStorageProvider ldapStorageProvider, String usernamePattern) {
