@@ -18,7 +18,8 @@ A collection of health-checks for Keycloak subsystems.
 | Keycloak-Health Check Version | Keycloak         | Keycloak.X      |
 |-------------------------------|------------------|-----------------|
 | 15.0.2.0                      | 15.0.2 - 17.0.1  | not supported   |
-| 17.0.1.0                      | 17.0.1           | 17.0.1          |
+| 17.0.1.4                      | 17.0.1 - 18.0.1  | 17.0.1 - 18.0.1 |
+| 19.0.0.0                      | 19.0.1           | 19.0.0          |
 
 ## Build
 
