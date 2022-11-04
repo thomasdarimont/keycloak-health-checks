@@ -10,7 +10,6 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.LDAPConstants;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
-import org.keycloak.storage.CacheableStorageProviderModel;
 import org.keycloak.storage.UserStorageProvider;
 import org.keycloak.storage.UserStorageProviderModel;
 import org.keycloak.storage.ldap.LDAPStorageProvider;
@@ -149,13 +148,14 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
 
     protected List<LDAPObject> searchUsersInLdapByUsername(RealmModel realm, LDAPStorageProvider ldapStorageProvider, String usernamePattern) {
 
-        LDAPQuery ldapQuery = LDAPUtils.createQueryForUserSearch(ldapStorageProvider, realm);
-        LDAPQueryConditionsBuilder conditionsBuilder = new LDAPQueryConditionsBuilder();
-        Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern, EscapeStrategy.NON_ASCII_CHARS_ONLY);
-        ldapQuery.addWhereCondition(usernameCondition);
-        ldapQuery.setLimit(LDAP_QUERY_RESULT_LIMIT);
+        try (LDAPQuery ldapQuery = LDAPUtils.createQueryForUserSearch(ldapStorageProvider, realm)) {
+            LDAPQueryConditionsBuilder conditionsBuilder = new LDAPQueryConditionsBuilder();
+            Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern, EscapeStrategy.NON_ASCII_CHARS_ONLY);
+            ldapQuery.addWhereCondition(usernameCondition);
+            ldapQuery.setLimit(LDAP_QUERY_RESULT_LIMIT);
 
-        return ldapQuery.getResultList();
+            return ldapQuery.getResultList();
+        }
     }
 
     public static class LdapStatusInfo {

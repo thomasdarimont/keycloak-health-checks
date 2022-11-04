@@ -2,7 +2,6 @@ package com.github.thomasdarimont.keycloak.healthchecker.spi.ldap;
 
 import com.github.thomasdarimont.keycloak.healthchecker.spi.HealthIndicator;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.HealthIndicatorFactory;
-import com.github.thomasdarimont.keycloak.healthchecker.spi.infinispan.InfinispanHealthIndicator;
 import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
@@ -15,7 +14,7 @@ public class LdapHealthIndicatorFactory implements HealthIndicatorFactory {
 
     @Override
     public HealthIndicator create(KeycloakSession session) {
-        return new LdapHealthIndicator(session,config);
+        return new LdapHealthIndicator(session, config);
     }
 
     @Override

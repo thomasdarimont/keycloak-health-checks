@@ -11,15 +11,15 @@ A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 17.0.1+
+* KeyCloak 19.0.3+
 
 ## Compatibility
 
-| Keycloak-Health Check Version | Keycloak         | Keycloak.X      |
-|-------------------------------|------------------|-----------------|
-| 15.0.2.0                      | 15.0.2 - 17.0.1  | not supported   |
-| 17.0.1.4                      | 17.0.1 - 18.0.1  | 17.0.1 - 18.0.1 |
-| 19.0.0.0                      | 19.0.1           | 19.0.0          |
+| Keycloak-Health Check Version | Keycloak        | Keycloak.X      |
+|-------------------------------|-----------------|-----------------|
+| 15.0.2.0                      | 15.0.2 - 17.0.1 | not supported   |
+| 17.0.1.4                      | 17.0.1 - 18.0.1 | 17.0.1 - 18.0.1 |
+| 19.0.3.0                      | 19.0.1 - 19.0.3 | 19.0.1 - 19.0.3 |
 
 ## Build
 
@@ -62,7 +62,7 @@ You are disconnected at the moment. Type 'connect' to connect to the server or '
 [disconnected /] connect
 [standalone@localhost:9990 /] 
 
-[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.enterprise.api,javax.transaction.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
+[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-model-legacy,org.keycloak.keycloak-model-legacy-private,org.keycloak.keycloak-model-legacy-services,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.enterprise.api,javax.transaction.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
 ```
 
 Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` and copy the .jar file next to the module.xml file:
@@ -79,6 +79,9 @@ Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak
     <dependencies>
         <module name="org.keycloak.keycloak-core"/>
         <module name="org.keycloak.keycloak-services"/>
+        <module name="org.keycloak.keycloak-model-legacy"/>
+        <module name="org.keycloak.keycloak-model-legacy-services"/>
+        <module name="org.keycloak.keycloak-model-legacy-private"/>
         <module name="org.keycloak.keycloak-server-spi"/>
         <module name="org.keycloak.keycloak-server-spi-private"/>
         <module name="org.keycloak.keycloak-ldap-federation"/>
