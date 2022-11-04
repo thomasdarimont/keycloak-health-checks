@@ -11,7 +11,7 @@ A collection of health-checks for Keycloak subsystems.
 
 ## Requirements
 
-* KeyCloak 19.0.3+
+* Keycloak 20.0.0
 
 ## Compatibility
 
@@ -20,6 +20,7 @@ A collection of health-checks for Keycloak subsystems.
 | 15.0.2.0                      | 15.0.2 - 17.0.1 | not supported   |
 | 17.0.1.4                      | 17.0.1 - 18.0.1 | 17.0.1 - 18.0.1 |
 | 19.0.3.0                      | 19.0.1 - 19.0.3 | 19.0.1 - 19.0.3 |
+| 20.0.0.0                      | 20.0.0          | not supported   |
 
 ## Build
 
@@ -46,97 +47,6 @@ The following health-check providers are supported:
 To disable the `filesystem-health` check, one can use the following config setting in keycloak.conf
 ```
 spi-health-filesystem-health-enabled=false
-```
-
-
-## Keycloak-Legacy
-
-### Installation
-
-After the extension has been built, install it as a JBoss/WildFly module via `jboss-cli`:
-
-```
-
-$ bin/jboss-cli.sh 
-You are disconnected at the moment. Type 'connect' to connect to the server or 'help' for the list of supported commands.
-[disconnected /] connect
-[standalone@localhost:9990 /] 
-
-[standalone@localhost:9990 /] module add --name=com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks --resources=/home/tom/dev/repos/gh/thomasdarimont/keycloak-dev/keycloak-health-checks/target/keycloak-health-checks.jar --dependencies=org.keycloak.keycloak-core,org.keycloak.keycloak-services,org.keycloak.keycloak-server-spi,org.keycloak.keycloak-server-spi-private,org.keycloak.keycloak-model-legacy,org.keycloak.keycloak-model-legacy-private,org.keycloak.keycloak-model-legacy-services,org.keycloak.keycloak-ldap-federation,org.keycloak.keycloak-kerberos-federation,org.jboss.resteasy.resteasy-jaxrs,org.apache.httpcomponents,com.google.guava,javax.api,javax.enterprise.api,javax.transaction.api,javax.ws.rs.api,com.fasterxml.jackson.core.jackson-core,com.fasterxml.jackson.core.jackson-databind,com.fasterxml.jackson.core.jackson-annotations,org.jboss.logging,org.infinispan,org.infinispan.commons
-```
-
-Alternatively, create `$KEYCLOAK_HOME/modules/com/github/thomasdarimont/keycloak/extensions/keycloak-health-checks/main/module.xml` and copy the .jar file next to the module.xml file:
-
-```xml
-<?xml version='1.0' encoding='UTF-8'?>
-
-<module xmlns="urn:jboss:module:1.1" name="com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks">
-
-    <resources>
-        <resource-root path="keycloak-health-checks.jar"/>
-    </resources>
-
-    <dependencies>
-        <module name="org.keycloak.keycloak-core"/>
-        <module name="org.keycloak.keycloak-services"/>
-        <module name="org.keycloak.keycloak-model-legacy"/>
-        <module name="org.keycloak.keycloak-model-legacy-services"/>
-        <module name="org.keycloak.keycloak-model-legacy-private"/>
-        <module name="org.keycloak.keycloak-server-spi"/>
-        <module name="org.keycloak.keycloak-server-spi-private"/>
-        <module name="org.keycloak.keycloak-ldap-federation"/>
-        <module name="org.keycloak.keycloak-kerberos-federation"/>
-        <module name="org.jboss.resteasy.resteasy-jaxrs"/>
-        <module name="org.apache.httpcomponents"/>
-        <module name="com.google.guava"/>
-        <module name="javax.api"/>
-        <module name="javax.transaction.api"/>
-        <module name="javax.enterprise.api"/>
-        <module name="javax.ws.rs.api"/>
-        <module name="com.fasterxml.jackson.core.jackson-core"/>
-        <module name="com.fasterxml.jackson.core.jackson-databind"/>
-        <module name="com.fasterxml.jackson.core.jackson-annotations"/>
-        <module name="org.jboss.logging"/>
-        <module name="org.infinispan"/>
-        <module name="org.infinispan.commons"/>
-    </dependencies>
-</module>
-```
-
-To uninstall the provider just remove the ... from `standalone.xml` or `standalone-ha.xml`.
-To uninstall the module just remove the `com/github/thomasdarimont...` directory in your `modules` folder.
-
-### Configuration
-
-Edit the wildfly `standalone.xml` or `standalone-ha.xml`
-`$KEYCLOAK_HOME/standalone/configuration/standalone.xml`:
-
-```xml
-...
-        <subsystem xmlns="urn:jboss:domain:keycloak-server:1.1">
-            <web-context>auth</web-context>
-            <providers>
-                <provider>
-                    classpath:${jboss.home.dir}/providers/*
-                </provider>
-                <provider>module:com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks</provider>
-            </providers>
-...
-```
-
-... or register the provider via the module via `jboss-cli`:
-```
-/subsystem=keycloak-server:list-add(name=providers,value=module:com.github.thomasdarimont.keycloak.extensions.keycloak-health-checks)
-```
-
-#### Disabling a Health-Check with Keycloak-Legacy
-
-A healh-check can be disabled via the jboss-cli.
-
-To disable the `filesystem-health` check, one can use the following command:
-```
-/subsystem=keycloak-server/spi=health/:add
-/subsystem=keycloak-server/spi=health/provider=filesystem-health/:add(enabled=false)
 ```
 
 ## Running example
