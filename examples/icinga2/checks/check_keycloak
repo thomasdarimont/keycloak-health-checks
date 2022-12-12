@@ -267,7 +267,7 @@ if ($config->check == "summary")
                         switch ($json->details->infinispan->state)
                         {
                                 case "UP":
-                                        $freeRam = (100 - (100 / $json->details->infinispan->hostInfo->totalMemoryKb * $json->details->infinispan->hostInfo->freeMemoryInKb));
+                                        $freeRam = (100 / $json->details->infinispan->hostInfo->totalMemoryKb * $json->details->infinispan->hostInfo->freeMemoryInKb);
 
                                         if ($freeRam < 20)
                                         {
