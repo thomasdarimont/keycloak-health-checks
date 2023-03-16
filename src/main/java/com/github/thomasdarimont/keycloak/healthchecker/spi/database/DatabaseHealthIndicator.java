@@ -24,13 +24,13 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator {
 
     protected final String jndiName;
 
-    protected final int connectionTimeoutMillis;
+    protected final int connectionTimeout;
 
     public DatabaseHealthIndicator(KeycloakSession session, Config.Scope config) {
         super("database");
         this.jndiName = config.get("jndiName", KEYCLOAK_DATASOURCE_JNDI_NAME);
         this.healthQuery = config.get("query");
-        this.connectionTimeoutMillis = config.getInt("connectionTimeout", 1000);
+        this.connectionTimeout = config.getInt("connectionTimeout", 1);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class DatabaseHealthIndicator extends AbstractHealthIndicator {
                     }
                 }
             } else {
-                valid = connection.isValid(connectionTimeoutMillis);
+                valid = connection.isValid(connectionTimeout);
             }
             log.debugf("Connection is Valid %s", valid);
             return valid;
