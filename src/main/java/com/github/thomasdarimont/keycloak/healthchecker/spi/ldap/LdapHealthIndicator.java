@@ -150,7 +150,7 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
 
         try (LDAPQuery ldapQuery = LDAPUtils.createQueryForUserSearch(ldapStorageProvider, realm)) {
             LDAPQueryConditionsBuilder conditionsBuilder = new LDAPQueryConditionsBuilder();
-            Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern, EscapeStrategy.NON_ASCII_CHARS_ONLY);
+            Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern, EscapeStrategy.DEFAULT_EXCEPT_ASTERISK);
             ldapQuery.addWhereCondition(usernameCondition);
             ldapQuery.setLimit(LDAP_QUERY_RESULT_LIMIT);
 
