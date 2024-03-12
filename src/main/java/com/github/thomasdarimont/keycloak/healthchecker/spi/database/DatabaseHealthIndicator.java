@@ -8,7 +8,7 @@ import org.keycloak.Config;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.utils.StringUtil;
 
-import javax.enterprise.inject.spi.CDI;
+import jakarta.enterprise.inject.spi.CDI;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.sql.Connection;
