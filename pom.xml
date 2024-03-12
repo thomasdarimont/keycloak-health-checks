@@ -6,7 +6,7 @@
 
     <groupId>com.github.thomasdarimont.keycloak</groupId>
     <artifactId>keycloak-health-checks</artifactId>
-    <version>22.0.5.1</version>
+    <version>23.0.7.0</version>
 
     <properties>
         <!-- general settings -->
@@ -18,11 +18,11 @@
         <!-- dependency versions -->
         <lombok.version>1.18.24</lombok.version>
 
-        <keycloak.version>22.0.5</keycloak.version>
+        <keycloak.version>23.0.7</keycloak.version>
         <keycloak.versionedArtifactName>keycloak-${keycloak.version}</keycloak.versionedArtifactName>
-        <infinispan.version>14.0.17.Final</infinispan.version>
+        <infinispan.version>14.0.21.Final</infinispan.version>
         <cdi-api.version>2.0.2</cdi-api.version>
-        <quarkus.version>3.2.7.Final</quarkus.version>
+        <quarkus.version>3.2.10.Final</quarkus.version>
     </properties>
 
     <dependencies>
