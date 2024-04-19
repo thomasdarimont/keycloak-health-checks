@@ -21,6 +21,7 @@ A collection of health-checks for Keycloak subsystems.
 | 17.0.1.4                      | 17.0.1 - 18.0.1 | 17.0.1 - 18.0.1 |
 | 19.0.3.0                      | 19.0.1 - 19.0.3 | 19.0.1 - 19.0.3 |
 | 20.0.0.0                      | 20.0.0          | not supported   |
+| 23.0.7.0                      | 22.0.0 - 23.0.7 | not supported   |
 
 ## Build
 
