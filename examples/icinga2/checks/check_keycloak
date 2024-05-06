@@ -71,6 +71,7 @@ $help .= " -n                   Disable certificate checks\n";
 $help .= " -S                   Do not verify host, while using ssl\n";
 $help .= " -s                   Do not verify peer, while using ssl\n";
 $help .= " -F                   Follow location on redirect\n";
+$help .= " -f                   Disable filesystem check\n";
 $help .= " -X                   Do not do anything, just print config\n";
 $help .= " -J                   Do not check, just print json object\n";
 $help .= " -j                   Do not check, just print response\n";
@@ -87,6 +88,7 @@ $config->ca_info = null;
 $config->ca_path = "/etc/ssl/certs";
 $config->user_agent = "Icinga2 Keycloak check 1.0";
 $config->follow_location = false;
+$config->filesystem_check = true;
 $config->ssl_verify_host = 2;
 $config->ssl_verify_peer = 1;
 $config->no_certificate_checks = false;
@@ -144,6 +146,9 @@ for ($i = 0; $i < $argc; $i++)
                         break;
                 case "-j":
                         $config->print_raw_result = true;
+                        break;
+                case "-f":
+                        $config->filesystem_check = false;
                         break;
                 case "-h":
                         icingamsg($help);
@@ -250,18 +255,20 @@ if ($config->check == "summary")
                                         break;
                         }
 
-                        switch ($json->details->filesystem->state)
-                        {
-                                case "UP":
-                                        break;
-                                case "DOWN":
-                                        $check_result = "CRITICAL";
-                                        $check_msg = "Filesystem in down state, free ".format_size($json->details->filesystem->freebytes);
-                                        break;
-                                default:
-                                        $check_result = "UNKNOWN";
-                                        $check_msg = "Filesystem has unknown state ".$json->details->filesystem->state.", free ".format_size($json->details->filesystem->freebytes);
-                                        break;
+                        if ($config->filesystem_check)
+                                switch ($json->details->filesystem->state)
+                                {
+                                        case "UP":
+                                                break;
+                                        case "DOWN":
+                                                $check_result = "CRITICAL";
+                                                $check_msg = "Filesystem in down state, free ".format_size($json->details->filesystem->freebytes);
+                                                break;
+                                        default:
+                                                $check_result = "UNKNOWN";
+                                                $check_msg = "Filesystem has unknown state ".$json->details->filesystem->state.", free ".format_size($json->details->filesystem->freebytes);
+                                                break;
+                                }
                         }
 
                         switch ($json->details->infinispan->state)
