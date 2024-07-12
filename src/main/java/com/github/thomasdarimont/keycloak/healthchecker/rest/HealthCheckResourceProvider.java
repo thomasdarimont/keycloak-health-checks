@@ -1,6 +1,5 @@
 package com.github.thomasdarimont.keycloak.healthchecker.rest;
 
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.services.resource.RealmResourceProvider;
 

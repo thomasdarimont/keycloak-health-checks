@@ -3,7 +3,6 @@ package com.github.thomasdarimont.keycloak.healthchecker.spi.infinispan;
 import com.github.thomasdarimont.keycloak.healthchecker.model.HealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.model.KeycloakHealthStatus;
 import com.github.thomasdarimont.keycloak.healthchecker.spi.AbstractHealthIndicator;
-import com.github.thomasdarimont.keycloak.healthchecker.support.KeycloakUtil;
 import io.quarkus.arc.Arc;
 import lombok.extern.jbosslog.JBossLog;
 import org.infinispan.health.ClusterHealth;
@@ -52,8 +51,7 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
                 .withAttribute("healthStatus", clusterHealth.getHealthStatus()) //
                 .withAttribute("numberOfNodes", clusterHealth.getNumberOfNodes()) //
                 .withAttribute("nodeNames", clusterHealth.getNodeNames())
-                .withAttribute("cacheDetails", detailedCacheHealthInfo)
-        ;
+                .withAttribute("cacheDetails", detailedCacheHealthInfo);
 
         return status;
     }
@@ -64,18 +62,8 @@ public class InfinispanHealthIndicator extends AbstractHealthIndicator {
 
     protected EmbeddedCacheManager lookupCacheManager() {
 
-        if (KeycloakUtil.isRunningOnKeycloak()) {
-            try {
-                Object cacheManager = new InitialContext().lookup(jndiName);
-                return (EmbeddedCacheManager) cacheManager;
-            } catch (NamingException e) {
-                log.warnv("Could not find EmbeddedCacheManager with name: {0}", jndiName);
-                throw new RuntimeException(e);
-            }
-        }
-
-        // Manual lookup via Arc for Keycloak.X
-        return Arc.container().instance(CacheManagerFactory.class).get().getOrCreate();
+        // Manual lookup via Arc for Quarkus Keycloak
+        return Arc.container().instance(CacheManagerFactory.class).get().getOrCreateEmbeddedCacheManager();
     }
 
     protected KeycloakHealthStatus determineClusterHealth(ClusterHealth clusterHealth) {

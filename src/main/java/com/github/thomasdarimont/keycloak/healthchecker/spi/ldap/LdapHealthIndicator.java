@@ -16,7 +16,6 @@ import org.keycloak.storage.ldap.LDAPStorageProvider;
 import org.keycloak.storage.ldap.LDAPUtils;
 import org.keycloak.storage.ldap.idm.model.LDAPObject;
 import org.keycloak.storage.ldap.idm.query.Condition;
-import org.keycloak.storage.ldap.idm.query.EscapeStrategy;
 import org.keycloak.storage.ldap.idm.query.internal.LDAPQuery;
 import org.keycloak.storage.ldap.idm.query.internal.LDAPQueryConditionsBuilder;
 
@@ -150,7 +149,7 @@ public class LdapHealthIndicator extends AbstractHealthIndicator {
 
         try (LDAPQuery ldapQuery = LDAPUtils.createQueryForUserSearch(ldapStorageProvider, realm)) {
             LDAPQueryConditionsBuilder conditionsBuilder = new LDAPQueryConditionsBuilder();
-            Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern, EscapeStrategy.NON_ASCII_CHARS_ONLY);
+            Condition usernameCondition = conditionsBuilder.equal(UserModel.USERNAME, usernamePattern);
             ldapQuery.addWhereCondition(usernameCondition);
             ldapQuery.setLimit(LDAP_QUERY_RESULT_LIMIT);
 
